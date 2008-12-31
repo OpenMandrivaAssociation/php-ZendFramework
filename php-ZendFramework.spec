@@ -6,7 +6,7 @@
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
 Version:	1.6.0
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	BSD
 Group:		Development/PHP
 URL:		http://framework.zend.com/
