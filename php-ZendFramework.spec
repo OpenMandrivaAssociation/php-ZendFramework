@@ -5,8 +5,8 @@
 
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
-Version:	1.6.0
-Release:	%mkrel 2
+Version:	1.7.5
+Release:	%mkrel 1
 License:	BSD
 Group:		Development/PHP
 URL:		http://framework.zend.com/
@@ -21,11 +21,12 @@ Requires:	php-hash
 Requires:	php-iconv
 Requires:	php-json
 Requires:	php-pcre
+Requires:	php-pdo
 Requires:	php-posix
 Requires:	php-session
 Requires:	php-simplexml
+Requires:	php-xml
 Requires:	php-zlib
-BuildRequires:	symlinks
 BuildArch:	noarch
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
@@ -50,10 +51,22 @@ Pdf, Search-Lucene and Services subpackages.
 Summary:	Unit tests for the Zend Framework
 Group:		Development/PHP
 Requires:	%{name} = %{version}-%{release}
-#Requires:	php-pear(pear.phpunit.de/PHPUnit) >= 3.0.0
+Requires:	php-pear-PHPUnit >= 3.0.0
+Requires:	php-channel-phpunit
+Requires:	fonts-ttf-bitstream-vera
+BuildRequires:	fonts-ttf-bitstream-vera
 
 %description	tests
 This package includes Zend Framework unit tests for all available subpackages.
+
+%package	extras
+Summary:	Zend Framework Extras (ZendX)
+Group:		Development/PHP
+Requires:	%{name} = %{version}-%{release}
+Provides:	%{name}-ZendX = %{version}-%{release}
+
+%description	extras
+This package includes the ZendX libraries.
 
 %package	Cache-Backend-Apc
 Summary:	Zend Framework APC cache backend
@@ -75,6 +88,16 @@ Requires:	php-memcache
 This package contains the back end for Zend_Cache to store and retrieve data
 via memcache.
 
+#package	Cache-Backend-Sqlite
+#Summary:	Zend Framework sqlite back end
+#Group:		Development/PHP
+#Requires:	%{name} = %{version}-%{release}
+#Requires:	php-sqlite
+
+#description Cache-Backend-Sqlite
+#This package contains the back end for Zend_Cache to store and retrieve data
+#via sqlite databases.
+
 %package	Captcha
 Summary:	Zend Framework CAPTCHA component
 Group:		Development/PHP
@@ -92,6 +115,46 @@ Requires:	%{name} = %{version}-%{release}
 %description	Dojo
 This package contains the Zend Framework Dojo Toolkit component as well as a
 copy of Dojo itself.
+
+#package	Db-Adapter-Mysqli
+#Summary:	Zend Framework database adapter for mysqli
+#Group:		Development/PHP
+#Requires:	%{name} = %{version}-%{release}
+#Requires:	php-mysqli
+
+#description	Db-Adapter-Mysqli
+#This package contains the files for Zend Framework necessary to connect to a
+#MySQL database via mysqli connector.
+
+#package Db-Adapter-Db2
+#Summary:  Zend Framework database adapter for DB2
+#Group:    Development/PHP
+#Requires: %{name} = %{version}-%{release}
+#Requires: php-ibm_db2 # Not available in Mandriva's PHP
+
+#description Db-Adapter-Db2
+#This package contains the files for Zend Framework necessary to connect to an
+#IBM DB2 database.
+
+#package	Db-Adapter-Firebird
+#Summary:	Zend Framework database adapter for InterBase
+#Group:		Development/PHP
+#Requires:	%{name} = %{version}-%{release}
+#Requires:	php-interbase
+
+#description Db-Adapter-Firebird
+#This package contains the files for Zend Framework necessary to connect to a
+#Firebird/InterBase database.
+
+#package Db-Adapter-Oracle
+#Summary:  Zend Framework database adapter for Oracle
+#Group:    Development/PHP
+#Requires: %{name} = %{version}-%{release}
+#Requires: php-oci8 # Not available in Mandriva's PHP
+
+#description Db-Adapter-Oracle
+#This package contains the files for Zend Framework necessary to connect to an
+#Oracle database.
 
 %package	Feed
 Summary:	Live syndication feeds helper
@@ -143,8 +206,7 @@ documents.
 Summary:	Apache Lucene engine PHP port
 Group:		Development/PHP
 Requires:	%{name} = %{version}-%{release}
-# php-pecl-bitset is not available but this is an optional requirement
-# Requires: php-bitset
+Requires:	php-bitset
 
 %description	Search-Lucene
 The Apache Lucene engine is a powerful, feature-rich Java search engine that is
@@ -177,7 +239,6 @@ This package contains web service client APIs for the following services:
 - Yahoo!
 
 %prep
-
 %setup -qn %{php_name}-%{version}
 
 %build
@@ -187,138 +248,171 @@ find . -type f -perm /111 \
 find . -type f -name \*.sh \
   -fprint valid_executables -exec %{__chmod} +x '{}' \; >/dev/null
 
-cat executables valid_executables|sort|uniq -u > invalid_executables
+%{__cat} executables valid_executables|sort|uniq -u > invalid_executables
+
 
 %install
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
-install -d %{buildroot}%{_datadir}/pear
-cp -pr library/Zend %{buildroot}%{_datadir}/pear
-cp -pr demos/Zend %{buildroot}%{_datadir}/pear/Zend/demos
-cp -pr tests %{buildroot}%{_datadir}/pear/Zend
-cp -pr externals %{buildroot}%{_datadir}/pear/Zend
-cp -pr laboratory/Zend_Tool/library/ZendL %{buildroot}%{_datadir}/pear
-cp -pr laboratory/Zend_Tool/tests %{buildroot}%{_datadir}/pear/ZendL
-cp -pr laboratory/Zend_Tool/bin/zf.{php,sh} %{buildroot}%{_datadir}/pear/ZendL
+%{__mkdir_p} %{buildroot}%{_datadir}/php
+%{__cp} -pr library/Zend %{buildroot}%{_datadir}/php
+%{__cp} -pr demos/Zend %{buildroot}%{_datadir}/php/Zend/demos
+%{__cp} -pr tests %{buildroot}%{_datadir}/php/Zend
+%{__cp} -pr externals %{buildroot}%{_datadir}/php/Zend
 
-install -d %{buildroot}%{_bindir}
-ln -s %{buildroot}%{_datadir}/pear/ZendL/zf.sh %{buildroot}%{_bindir}/zf
-symlinks -c %{buildroot}%{_bindir} > /dev/null
+# ZendX
+cd extras
+%{__cp} -pr library/ZendX %{buildroot}%{_datadir}/php
+%{__cp} -pr tests %{buildroot}%{_datadir}/php/ZendX
+cd ..
+
+# Zend_Tool, still in development
+cd incubator
+%{__cp} -pr library/Zend/Tool %{buildroot}%{_datadir}/php/Zend
+%{__cp} -pr tests/* %{buildroot}%{_datadir}/php/Zend/tests
+%{__cp} -pr bin/zf.{php,sh} \
+  %{buildroot}%{_datadir}/php/Zend
+%{__mkdir_p} %{buildroot}%{_bindir}
+%{__ln_s} %{_datadir}/php/Zend/zf.sh %{buildroot}%{_bindir}/zf
+cd ..
+
+# rhbz 477440
+
+pushd %{buildroot}%{_datadir}/php/Zend/tests/Zend/Pdf/_fonts
+    for i in *.ttf; do
+	ln -snf %{_datadir}/fonts/TTF/$i $i
+    done
+popd
 
 %clean
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
-%doc LICENSE.txt INSTALL.txt README.txt
-%{_datadir}/pear/Zend
-%exclude %{_datadir}/pear/Zend/demos
-%exclude %{_datadir}/pear/Zend/tests
-%exclude %{_datadir}/pear/Zend/Cache/Backend/Apc.php
-%exclude %{_datadir}/pear/Zend/Cache/Backend/Memcached.php
-%exclude %{_datadir}/pear/Zend/Captcha
-%exclude %{_datadir}/pear/Zend/Dojo.php
-%exclude %{_datadir}/pear/Zend/Dojo
-%exclude %{_datadir}/pear/Zend/Feed.php
-%exclude %{_datadir}/pear/Zend/Feed
-%exclude %{_datadir}/pear/Zend/Gdata.php
-%exclude %{_datadir}/pear/Zend/Gdata
-%exclude %{_datadir}/pear/Zend/Pdf.php
-%exclude %{_datadir}/pear/Zend/Pdf
-%exclude %{_datadir}/pear/Zend/Search
-%exclude %{_datadir}/pear/Zend/Service/Akismet.php
-%exclude %{_datadir}/pear/Zend/Service/Amazon.php
-%exclude %{_datadir}/pear/Zend/Service/Amazon
-%exclude %{_datadir}/pear/Zend/Service/Audioscrobbler.php
-%exclude %{_datadir}/pear/Zend/Service/Delicious.php
-%exclude %{_datadir}/pear/Zend/Service/Delicious
-%exclude %{_datadir}/pear/Zend/Service/Flickr.php
-%exclude %{_datadir}/pear/Zend/Service/Flickr
-%exclude %{_datadir}/pear/Zend/Service/Nirvanix.php
-%exclude %{_datadir}/pear/Zend/Service/Nirvanix
-%exclude %{_datadir}/pear/Zend/Service/ReCaptcha.php
-%exclude %{_datadir}/pear/Zend/Service/ReCaptcha
-%exclude %{_datadir}/pear/Zend/Service/Simpy.php
-%exclude %{_datadir}/pear/Zend/Service/Simpy
-%exclude %{_datadir}/pear/Zend/Service/SlideShare.php
-%exclude %{_datadir}/pear/Zend/Service/SlideShare
-%exclude %{_datadir}/pear/Zend/Service/StrikeIron.php
-%exclude %{_datadir}/pear/Zend/Service/StrikeIron
-%exclude %{_datadir}/pear/Zend/Service/Technorati.php
-%exclude %{_datadir}/pear/Zend/Service/Technorati
-%exclude %{_datadir}/pear/Zend/Service/Yahoo.php
-%exclude %{_datadir}/pear/Zend/Service/Yahoo
-%exclude %{_datadir}/pear/Zend/externals/dojo
-%{_datadir}/pear/ZendL
+%{_datadir}/php/Zend
+%exclude %{_datadir}/php/Zend/demos
+%exclude %{_datadir}/php/Zend/tests
+%exclude %{_datadir}/php/Zend/Cache/Backend/Apc.php
+%exclude %{_datadir}/php/Zend/Cache/Backend/Memcached.php
+%exclude %{_datadir}/php/Zend/Captcha
+%exclude %{_datadir}/php/Zend/Dojo.php
+%exclude %{_datadir}/php/Zend/Dojo
+%exclude %{_datadir}/php/Zend/Feed.php
+%exclude %{_datadir}/php/Zend/Feed
+%exclude %{_datadir}/php/Zend/Gdata.php
+%exclude %{_datadir}/php/Zend/Gdata
+%exclude %{_datadir}/php/Zend/Pdf.php
+%exclude %{_datadir}/php/Zend/Pdf
+%exclude %{_datadir}/php/Zend/Search
+%exclude %{_datadir}/php/Zend/Service/Akismet.php
+%exclude %{_datadir}/php/Zend/Service/Amazon.php
+%exclude %{_datadir}/php/Zend/Service/Amazon
+%exclude %{_datadir}/php/Zend/Service/Audioscrobbler.php
+%exclude %{_datadir}/php/Zend/Service/Delicious.php
+%exclude %{_datadir}/php/Zend/Service/Delicious
+%exclude %{_datadir}/php/Zend/Service/Flickr.php
+%exclude %{_datadir}/php/Zend/Service/Flickr
+%exclude %{_datadir}/php/Zend/Service/Nirvanix.php
+%exclude %{_datadir}/php/Zend/Service/Nirvanix
+%exclude %{_datadir}/php/Zend/Service/ReCaptcha.php
+%exclude %{_datadir}/php/Zend/Service/ReCaptcha
+%exclude %{_datadir}/php/Zend/Service/Simpy.php
+%exclude %{_datadir}/php/Zend/Service/Simpy
+%exclude %{_datadir}/php/Zend/Service/SlideShare.php
+%exclude %{_datadir}/php/Zend/Service/SlideShare
+%exclude %{_datadir}/php/Zend/Service/StrikeIron.php
+%exclude %{_datadir}/php/Zend/Service/StrikeIron
+%exclude %{_datadir}/php/Zend/Service/Technorati.php
+%exclude %{_datadir}/php/Zend/Service/Technorati
+%exclude %{_datadir}/php/Zend/Service/Yahoo.php
+%exclude %{_datadir}/php/Zend/Service/Yahoo
+%exclude %{_datadir}/php/Zend/externals/dojo
 %{_bindir}/zf
+
+%doc LICENSE.txt INSTALL.txt README.txt
 
 %files demos
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/demos
+%{_datadir}/php/Zend/demos
+%doc LICENSE.txt
 
 %files tests
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/tests
+%{_datadir}/php/Zend/tests
+%doc LICENSE.txt
+
+%files extras
+%defattr(-,root,root,-)
+%{_datadir}/php/ZendX
+%doc LICENSE.txt extras/documentation/api/extras/*
 
 %files Cache-Backend-Apc
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Cache/Backend/Apc.php
+%{_datadir}/php/Zend/Cache/Backend/Apc.php
+%doc LICENSE.txt
 
 %files Cache-Backend-Memcached
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Cache/Backend/Memcached.php
+%{_datadir}/php/Zend/Cache/Backend/Memcached.php
+%doc LICENSE.txt
 
 %files Captcha
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Captcha
+%{_datadir}/php/Zend/Captcha
+%doc LICENSE.txt
 
 %files Dojo
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Dojo.php
-%{_datadir}/pear/Zend/Dojo
-%{_datadir}/pear/Zend/externals/dojo
+%{_datadir}/php/Zend/Dojo.php
+%{_datadir}/php/Zend/Dojo
+%{_datadir}/php/Zend/externals/dojo
+%doc LICENSE.txt
 
 %files Feed
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Feed.php
-%{_datadir}/pear/Zend/Feed
+%{_datadir}/php/Zend/Feed.php
+%{_datadir}/php/Zend/Feed
+%doc LICENSE.txt
 
 %files Gdata
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Gdata.php
-%{_datadir}/pear/Zend/Gdata
+%{_datadir}/php/Zend/Gdata.php
+%{_datadir}/php/Zend/Gdata
+%doc LICENSE.txt
 
 %files Pdf
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Pdf.php
-%{_datadir}/pear/Zend/Pdf
+%{_datadir}/php/Zend/Pdf.php
+%{_datadir}/php/Zend/Pdf
+%doc LICENSE.txt
 
 %files Search-Lucene
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Search
+%{_datadir}/php/Zend/Search
+%doc LICENSE.txt
 
 %files Services
 %defattr(-,root,root,-)
-%{_datadir}/pear/Zend/Service/Akismet.php
-%{_datadir}/pear/Zend/Service/Amazon.php
-%{_datadir}/pear/Zend/Service/Amazon
-%{_datadir}/pear/Zend/Service/Audioscrobbler.php
-%{_datadir}/pear/Zend/Service/Delicious.php
-%{_datadir}/pear/Zend/Service/Delicious
-%{_datadir}/pear/Zend/Service/Flickr.php
-%{_datadir}/pear/Zend/Service/Flickr
-%{_datadir}/pear/Zend/Service/Nirvanix.php
-%{_datadir}/pear/Zend/Service/Nirvanix
-%{_datadir}/pear/Zend/Service/ReCaptcha.php
-%{_datadir}/pear/Zend/Service/ReCaptcha
-%{_datadir}/pear/Zend/Service/Simpy.php
-%{_datadir}/pear/Zend/Service/Simpy
-%{_datadir}/pear/Zend/Service/SlideShare.php
-%{_datadir}/pear/Zend/Service/SlideShare
-%{_datadir}/pear/Zend/Service/StrikeIron.php
-%{_datadir}/pear/Zend/Service/StrikeIron
-%{_datadir}/pear/Zend/Service/Technorati.php
-%{_datadir}/pear/Zend/Service/Technorati
-%{_datadir}/pear/Zend/Service/Yahoo.php
-%{_datadir}/pear/Zend/Service/Yahoo
-
+%{_datadir}/php/Zend/Service/Akismet.php
+%{_datadir}/php/Zend/Service/Amazon.php
+%{_datadir}/php/Zend/Service/Amazon
+%{_datadir}/php/Zend/Service/Audioscrobbler.php
+%{_datadir}/php/Zend/Service/Delicious.php
+%{_datadir}/php/Zend/Service/Delicious
+%{_datadir}/php/Zend/Service/Flickr.php
+%{_datadir}/php/Zend/Service/Flickr
+%{_datadir}/php/Zend/Service/Nirvanix.php
+%{_datadir}/php/Zend/Service/Nirvanix
+%{_datadir}/php/Zend/Service/ReCaptcha.php
+%{_datadir}/php/Zend/Service/ReCaptcha
+%{_datadir}/php/Zend/Service/Simpy.php
+%{_datadir}/php/Zend/Service/Simpy
+%{_datadir}/php/Zend/Service/SlideShare.php
+%{_datadir}/php/Zend/Service/SlideShare
+%{_datadir}/php/Zend/Service/StrikeIron.php
+%{_datadir}/php/Zend/Service/StrikeIron
+%{_datadir}/php/Zend/Service/Technorati.php
+%{_datadir}/php/Zend/Service/Technorati
+%{_datadir}/php/Zend/Service/Yahoo.php
+%{_datadir}/php/Zend/Service/Yahoo
+%doc LICENSE.txt
