@@ -5,8 +5,8 @@
 
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
-Version:	1.7.5
-Release:	%mkrel 2
+Version:	1.11.0
+Release:	%mkrel 1
 License:	BSD
 Group:		Development/PHP
 URL:		http://framework.zend.com/
@@ -266,18 +266,7 @@ cd extras
 %{__cp} -pr tests %{buildroot}%{_datadir}/php/ZendX
 cd ..
 
-# Zend_Tool, still in development
-cd incubator
-%{__cp} -pr library/Zend/Tool %{buildroot}%{_datadir}/php/Zend
-%{__cp} -pr tests/* %{buildroot}%{_datadir}/php/Zend/tests
-%{__cp} -pr bin/zf.{php,sh} \
-  %{buildroot}%{_datadir}/php/Zend
-%{__mkdir_p} %{buildroot}%{_bindir}
-%{__ln_s} %{_datadir}/php/Zend/zf.sh %{buildroot}%{_bindir}/zf
-cd ..
-
 # rhbz 477440
-
 pushd %{buildroot}%{_datadir}/php/Zend/tests/Zend/Pdf/_fonts
     for i in *.ttf; do
 	ln -snf %{_datadir}/fonts/TTF/$i $i
@@ -327,7 +316,6 @@ popd
 %exclude %{_datadir}/php/Zend/Service/Yahoo.php
 %exclude %{_datadir}/php/Zend/Service/Yahoo
 %exclude %{_datadir}/php/Zend/externals/dojo
-%{_bindir}/zf
 
 %doc LICENSE.txt INSTALL.txt README.txt
 
