@@ -5,7 +5,7 @@
 
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
-Version:	1.11.3
+Version:	1.11.4
 Release:	%mkrel 1
 License:	BSD
 Group:		Development/PHP
