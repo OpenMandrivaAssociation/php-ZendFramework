@@ -5,7 +5,7 @@
 
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
-Version:	1.11.10
+Version:	1.11.11
 Release:	%mkrel 1
 License:	BSD
 Group:		Development/PHP
@@ -332,7 +332,7 @@ popd
 %files extras
 %defattr(-,root,root,-)
 %{_datadir}/php/ZendX
-%doc LICENSE.txt extras/documentation/api/extras/*
+%doc LICENSE.txt
 
 %files Cache-Backend-Apc
 %defattr(-,root,root,-)
