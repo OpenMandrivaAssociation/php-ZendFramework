@@ -6,7 +6,7 @@
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
 Version:	1.11.11
-Release:	%mkrel 1
+Release:	2
 License:	BSD
 Group:		Development/PHP
 URL:		http://framework.zend.com/
@@ -28,7 +28,6 @@ Requires:	php-simplexml
 Requires:	php-xml
 Requires:	php-zlib
 BuildArch:	noarch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 Extending the art & spirit of PHP, Zend Framework is based on simplicity,
@@ -252,18 +251,16 @@ find . -type f -name \*.sh \
 
 
 %install
-%{__rm} -rf %{buildroot}
-
 %{__mkdir_p} %{buildroot}%{_datadir}/php
-%{__cp} -pr library/Zend %{buildroot}%{_datadir}/php
-%{__cp} -pr demos/Zend %{buildroot}%{_datadir}/php/Zend/demos
-%{__cp} -pr tests %{buildroot}%{_datadir}/php/Zend
-%{__cp} -pr externals %{buildroot}%{_datadir}/php/Zend
+cp -r library/Zend %{buildroot}%{_datadir}/php
+cp -r demos/Zend %{buildroot}%{_datadir}/php/Zend/demos
+cp -r tests %{buildroot}%{_datadir}/php/Zend
+cp -r externals %{buildroot}%{_datadir}/php/Zend
 
 # ZendX
 cd extras
-%{__cp} -pr library/ZendX %{buildroot}%{_datadir}/php
-%{__cp} -pr tests %{buildroot}%{_datadir}/php/ZendX
+cp -r library/ZendX %{buildroot}%{_datadir}/php
+cp -r tests %{buildroot}%{_datadir}/php/ZendX
 cd ..
 
 # rhbz 477440
@@ -273,11 +270,7 @@ pushd %{buildroot}%{_datadir}/php/Zend/tests/Zend/Pdf/_fonts
     done
 popd
 
-%clean
-%{__rm} -rf %{buildroot}
-
 %files
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend
 %exclude %{_datadir}/php/Zend/demos
 %exclude %{_datadir}/php/Zend/tests
@@ -320,67 +313,55 @@ popd
 %doc LICENSE.txt INSTALL.txt README.txt
 
 %files demos
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/demos
 %doc LICENSE.txt
 
 %files tests
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/tests
 %doc LICENSE.txt
 
 %files extras
-%defattr(-,root,root,-)
 %{_datadir}/php/ZendX
 %doc LICENSE.txt
 
 %files Cache-Backend-Apc
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Cache/Backend/Apc.php
 %doc LICENSE.txt
 
 %files Cache-Backend-Memcached
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Cache/Backend/Memcached.php
 %doc LICENSE.txt
 
 %files Captcha
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Captcha
 %doc LICENSE.txt
 
 %files Dojo
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Dojo.php
 %{_datadir}/php/Zend/Dojo
 %{_datadir}/php/Zend/externals/dojo
 %doc LICENSE.txt
 
 %files Feed
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Feed.php
 %{_datadir}/php/Zend/Feed
 %doc LICENSE.txt
 
 %files Gdata
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Gdata.php
 %{_datadir}/php/Zend/Gdata
 %doc LICENSE.txt
 
 %files Pdf
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Pdf.php
 %{_datadir}/php/Zend/Pdf
 %doc LICENSE.txt
 
 %files Search-Lucene
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Search
 %doc LICENSE.txt
 
 %files Services
-%defattr(-,root,root,-)
 %{_datadir}/php/Zend/Service/Akismet.php
 %{_datadir}/php/Zend/Service/Amazon.php
 %{_datadir}/php/Zend/Service/Amazon
@@ -404,3 +385,50 @@ popd
 %{_datadir}/php/Zend/Service/Yahoo.php
 %{_datadir}/php/Zend/Service/Yahoo
 %doc LICENSE.txt
+
+
+%changelog
+* Sun Dec 18 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.11-1mdv2012.0
++ Revision: 743481
+- 1.11.11
+
+* Fri Aug 12 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.10-1
++ Revision: 694093
+- 1.11.10
+
+* Sun Jun 19 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.7-1
++ Revision: 685972
+- 1.11.7
+
+* Mon Mar 07 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.4-1
++ Revision: 642441
+- 1.11.4
+
+* Thu Feb 17 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.3-1
++ Revision: 638134
+- 1.11.3
+
+* Sat Jan 01 2011 Guillaume Rousse <guillomovitch@mandriva.org> 1.11.0-1mdv2011.0
++ Revision: 627263
+- new version
+
+* Tue Sep 15 2009 Thierry Vignaud <tv@mandriva.org> 1.7.5-2mdv2010.0
++ Revision: 441781
+- rebuild
+
+* Tue Feb 17 2009 Oden Eriksson <oeriksson@mandriva.com> 1.7.5-1mdv2009.1
++ Revision: 341700
+- 1.7.5
+- sync slightly with fedora, but fix the symlink mess (duh!)
+
+* Wed Dec 31 2008 Oden Eriksson <oeriksson@mandriva.com> 1.6.0-2mdv2009.1
++ Revision: 321697
+- rebuild
+
+* Tue Oct 28 2008 Oden Eriksson <oeriksson@mandriva.com> 1.6.0-1mdv2009.1
++ Revision: 297910
+- import php-ZendFramework
+
+
+* Tue Oct 28 2008 Oden Eriksson <oeriksson@mandriva.com> 1.6.0-1mdv2009.0
+- initial Mandriva package (fedora import and adaptation)
