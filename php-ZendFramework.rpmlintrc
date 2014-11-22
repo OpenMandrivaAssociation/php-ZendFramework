@@ -1,0 +1,4 @@
+# dependency on php-zlib is not a "lib-dependency"
+addFilter("explicit-lib-dependency")
+# phpdoc-cache have strange permissions; let's leave them "as is"
+addFilter("non-standard-dir-perm")

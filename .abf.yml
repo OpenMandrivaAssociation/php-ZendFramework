@@ -1,2 +1,4 @@
+removed_sources:
+  ZendFramework-1.11.11.tar.gz: d85361b481d22d85be250a8cd7a84a05be13ecc8
 sources:
-  "ZendFramework-1.11.11.tar.gz:"	d85361b481d22d85be250a8cd7a84a05be13ecc8
+  ZendFramework-1.12.9.tar.gz: acb1349901758c88e4f94d0d1224f06d8ef1d64b

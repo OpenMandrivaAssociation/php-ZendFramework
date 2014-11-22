@@ -1,17 +1,17 @@
-%undefine __find_provides
-%undefine __find_requires
+# % global __requires_exclude pear\\((Zend|Test|example|PHPUnit/Framework.php)
 
 %define php_name ZendFramework
 
 Summary:	Leading open-source PHP framework
 Name:		php-ZendFramework
-Version:	1.11.11
-Release:	2
+Version:	1.12.9
+Release:	1
 License:	BSD
 Group:		Development/PHP
 URL:		http://framework.zend.com/
 Source0:	http://framework.zend.com/releases/%{php_name}-%{version}/%{php_name}-%{version}.tar.gz
-Requires:	php >= 5.1.4
+Source100:	%{name}.rpmlintrc
+Requires:	php
 Requires:	php-bcmath
 Requires:	php-ctype
 Requires:	php-curl
@@ -28,6 +28,9 @@ Requires:	php-simplexml
 Requires:	php-xml
 Requires:	php-zlib
 BuildArch:	noarch
+
+Provides:   pear(Zend/Log.php)
+Provides:   pear(Zend/Cache/Exception.php)
 
 %description
 Extending the art & spirit of PHP, Zend Framework is based on simplicity,
@@ -87,15 +90,6 @@ Requires:	php-memcache
 This package contains the back end for Zend_Cache to store and retrieve data
 via memcache.
 
-#package	Cache-Backend-Sqlite
-#Summary:	Zend Framework sqlite back end
-#Group:		Development/PHP
-#Requires:	%{name} = %{version}-%{release}
-#Requires:	php-sqlite
-
-#description Cache-Backend-Sqlite
-#This package contains the back end for Zend_Cache to store and retrieve data
-#via sqlite databases.
 
 %package	Captcha
 Summary:	Zend Framework CAPTCHA component
@@ -115,45 +109,6 @@ Requires:	%{name} = %{version}-%{release}
 This package contains the Zend Framework Dojo Toolkit component as well as a
 copy of Dojo itself.
 
-#package	Db-Adapter-Mysqli
-#Summary:	Zend Framework database adapter for mysqli
-#Group:		Development/PHP
-#Requires:	%{name} = %{version}-%{release}
-#Requires:	php-mysqli
-
-#description	Db-Adapter-Mysqli
-#This package contains the files for Zend Framework necessary to connect to a
-#MySQL database via mysqli connector.
-
-#package Db-Adapter-Db2
-#Summary:  Zend Framework database adapter for DB2
-#Group:    Development/PHP
-#Requires: %{name} = %{version}-%{release}
-#Requires: php-ibm_db2 # Not available in Mandriva's PHP
-
-#description Db-Adapter-Db2
-#This package contains the files for Zend Framework necessary to connect to an
-#IBM DB2 database.
-
-#package	Db-Adapter-Firebird
-#Summary:	Zend Framework database adapter for InterBase
-#Group:		Development/PHP
-#Requires:	%{name} = %{version}-%{release}
-#Requires:	php-interbase
-
-#description Db-Adapter-Firebird
-#This package contains the files for Zend Framework necessary to connect to a
-#Firebird/InterBase database.
-
-#package Db-Adapter-Oracle
-#Summary:  Zend Framework database adapter for Oracle
-#Group:    Development/PHP
-#Requires: %{name} = %{version}-%{release}
-#Requires: php-oci8 # Not available in Mandriva's PHP
-
-#description Db-Adapter-Oracle
-#This package contains the files for Zend Framework necessary to connect to an
-#Oracle database.
 
 %package	Feed
 Summary:	Live syndication feeds helper
@@ -188,6 +143,8 @@ Summary:	PDF file handling helper
 Group:		Development/PHP
 Requires:	%{name} = %{version}-%{release}
 Requires:	php-gd
+Provides:   pear(Zend/Pdf/FileParser/Image/Jpeg.php) 
+Provides:   pear(Zend/Pdf/FileParser/Image/Tiff.php)
 
 %description	Pdf
 Portable Document Format (PDF) from Adobe is the de facto standard for
@@ -226,15 +183,23 @@ Requires:	%{name} = %{version}-%{release}
 This package contains web service client APIs for the following services:
 
 - Akismet
-- Amazon
+- Amazon (including EC2, S3)
 - Audioscrobbler
 - del.icio.us
+- Developer Garden
+- eBay
 - Flickr
+- LiveDocx
 - Nirvanix
-- Simpy
+- Rackspace
+- ReCaptcha
+- Various URL Shortener services
 - SlideShare
+- SqlAzure
 - StrikeIron
 - Technorati
+- Twitter
+- Windows Azure
 - Yahoo!
 
 %prep
@@ -247,20 +212,27 @@ find . -type f -perm /111 \
 find . -type f -name \*.sh \
   -fprint valid_executables -exec %{__chmod} +x '{}' \; >/dev/null
 
+find extras/documentation/api/extras/ -exec chmod a+r '{}' \; >/dev/null
+
 %{__cat} executables valid_executables|sort|uniq -u > invalid_executables
 
 
 %install
 %{__mkdir_p} %{buildroot}%{_datadir}/php
-cp -r library/Zend %{buildroot}%{_datadir}/php
-cp -r demos/Zend %{buildroot}%{_datadir}/php/Zend/demos
-cp -r tests %{buildroot}%{_datadir}/php/Zend
-cp -r externals %{buildroot}%{_datadir}/php/Zend
+
+
+# remove cruft that somehow slipped into the tarball
+rm -f library/Zend/.Version.php.un~
+
+cp -pr library/Zend %{buildroot}%{_datadir}/php
+cp -pr demos/Zend %{buildroot}%{_datadir}/php/Zend/demos
+cp -pr tests %{buildroot}%{_datadir}/php/Zend
+cp -pr externals %{buildroot}%{_datadir}/php/Zend
 
 # ZendX
 cd extras
-cp -r library/ZendX %{buildroot}%{_datadir}/php
-cp -r tests %{buildroot}%{_datadir}/php/ZendX
+cp -pr library/ZendX %{buildroot}%{_datadir}/php
+cp -pr tests %{buildroot}%{_datadir}/php/ZendX
 cd ..
 
 # rhbz 477440
@@ -270,7 +242,9 @@ pushd %{buildroot}%{_datadir}/php/Zend/tests/Zend/Pdf/_fonts
     done
 popd
 
+
 %files
+%doc LICENSE.txt DEVELOPMENT_README.md INSTALL.md README.md README-GIT.md
 %{_datadir}/php/Zend
 %exclude %{_datadir}/php/Zend/demos
 %exclude %{_datadir}/php/Zend/tests
@@ -294,12 +268,8 @@ popd
 %exclude %{_datadir}/php/Zend/Service/Delicious
 %exclude %{_datadir}/php/Zend/Service/Flickr.php
 %exclude %{_datadir}/php/Zend/Service/Flickr
-%exclude %{_datadir}/php/Zend/Service/Nirvanix.php
-%exclude %{_datadir}/php/Zend/Service/Nirvanix
 %exclude %{_datadir}/php/Zend/Service/ReCaptcha.php
 %exclude %{_datadir}/php/Zend/Service/ReCaptcha
-%exclude %{_datadir}/php/Zend/Service/Simpy.php
-%exclude %{_datadir}/php/Zend/Service/Simpy
 %exclude %{_datadir}/php/Zend/Service/SlideShare.php
 %exclude %{_datadir}/php/Zend/Service/SlideShare
 %exclude %{_datadir}/php/Zend/Service/StrikeIron.php
@@ -310,7 +280,6 @@ popd
 %exclude %{_datadir}/php/Zend/Service/Yahoo
 %exclude %{_datadir}/php/Zend/externals/dojo
 
-%doc LICENSE.txt INSTALL.txt README.txt
 
 %files demos
 %{_datadir}/php/Zend/demos
@@ -322,7 +291,7 @@ popd
 
 %files extras
 %{_datadir}/php/ZendX
-%doc LICENSE.txt
+%doc LICENSE.txt extras/documentation/api/extras/*
 
 %files Cache-Backend-Apc
 %{_datadir}/php/Zend/Cache/Backend/Apc.php
@@ -370,12 +339,8 @@ popd
 %{_datadir}/php/Zend/Service/Delicious
 %{_datadir}/php/Zend/Service/Flickr.php
 %{_datadir}/php/Zend/Service/Flickr
-%{_datadir}/php/Zend/Service/Nirvanix.php
-%{_datadir}/php/Zend/Service/Nirvanix
 %{_datadir}/php/Zend/Service/ReCaptcha.php
 %{_datadir}/php/Zend/Service/ReCaptcha
-%{_datadir}/php/Zend/Service/Simpy.php
-%{_datadir}/php/Zend/Service/Simpy
 %{_datadir}/php/Zend/Service/SlideShare.php
 %{_datadir}/php/Zend/Service/SlideShare
 %{_datadir}/php/Zend/Service/StrikeIron.php
@@ -385,50 +350,3 @@ popd
 %{_datadir}/php/Zend/Service/Yahoo.php
 %{_datadir}/php/Zend/Service/Yahoo
 %doc LICENSE.txt
-
-
-%changelog
-* Sun Dec 18 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.11-1mdv2012.0
-+ Revision: 743481
-- 1.11.11
-
-* Fri Aug 12 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.10-1
-+ Revision: 694093
-- 1.11.10
-
-* Sun Jun 19 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.7-1
-+ Revision: 685972
-- 1.11.7
-
-* Mon Mar 07 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.4-1
-+ Revision: 642441
-- 1.11.4
-
-* Thu Feb 17 2011 Oden Eriksson <oeriksson@mandriva.com> 1.11.3-1
-+ Revision: 638134
-- 1.11.3
-
-* Sat Jan 01 2011 Guillaume Rousse <guillomovitch@mandriva.org> 1.11.0-1mdv2011.0
-+ Revision: 627263
-- new version
-
-* Tue Sep 15 2009 Thierry Vignaud <tv@mandriva.org> 1.7.5-2mdv2010.0
-+ Revision: 441781
-- rebuild
-
-* Tue Feb 17 2009 Oden Eriksson <oeriksson@mandriva.com> 1.7.5-1mdv2009.1
-+ Revision: 341700
-- 1.7.5
-- sync slightly with fedora, but fix the symlink mess (duh!)
-
-* Wed Dec 31 2008 Oden Eriksson <oeriksson@mandriva.com> 1.6.0-2mdv2009.1
-+ Revision: 321697
-- rebuild
-
-* Tue Oct 28 2008 Oden Eriksson <oeriksson@mandriva.com> 1.6.0-1mdv2009.1
-+ Revision: 297910
-- import php-ZendFramework
-
-
-* Tue Oct 28 2008 Oden Eriksson <oeriksson@mandriva.com> 1.6.0-1mdv2009.0
-- initial Mandriva package (fedora import and adaptation)
