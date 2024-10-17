@@ -8,7 +8,7 @@ Version:	1.12.9
 Release:	1
 License:	BSD
 Group:		Development/PHP
-URL:		http://framework.zend.com/
+URL:		https://framework.zend.com/
 Source0:	http://framework.zend.com/releases/%{php_name}-%{version}/%{php_name}-%{version}.tar.gz
 Source100:	%{name}.rpmlintrc
 Requires:	php
